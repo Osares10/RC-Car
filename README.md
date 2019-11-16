@@ -14,7 +14,7 @@ This program wouldn't have been done without the help of this repository [arduin
 ## Usage
 For basic usage modify the following line in the path **/PC/test.c**
 
-    ```c
+    ```
     strcpy(serialport, "/dev/ttyACM0"); 
     ```
 to the corresponding port your arduino is using.
