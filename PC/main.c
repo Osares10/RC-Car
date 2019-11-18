@@ -1,20 +1,25 @@
+// Basic libraries for usage in linux
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
 
+// Library for serial communication
 #include "arduino-serial-lib.h"
 
+// Libraries for screen manipulation
 #include <termios.h>
 #include <ncurses.h>
 
 // To use time library of C 
 #include <time.h> 
 
+// Redifying variables for screen manipulation
 #define clear() printf("\033[H\033[J")
 #define gotoxy(x,y) printf("\033[%d;%dH", (y), (x))
 
+// Code for delays, obtained from:
 /* -B- https://www.geeksforgeeks.org/time-delay-c/ */
 void delay(int milliseconds){
     long pause;
@@ -27,6 +32,7 @@ void delay(int milliseconds){
 }
 /* -B- */
 
+// Code to get char from keyboard inputs, obtained from:
 /* -A- https://stackoverflow.com/questions/7469139/what-is-the-equivalent-to-getch-getche-in-linux */
 static struct termios old, current;
 
@@ -73,15 +79,16 @@ char getchet(void)
 }
 /* -A- */
 
+// Main program for arduino control
 int main(){
 
-    char c;
+    char c; // Variable for car character
     int i = 0;
 
     char car = '>';
-    int y = 3, x = 1;
+    int y = 3, x = 1; // Variable for car starter position
 
-    const int buf_max = 256;
+    const int buf_max = 256; // Max size for buffer
 
     int fd = -1;
     char serialport[buf_max];
@@ -92,29 +99,36 @@ int main(){
     char buf[buf_max];
     int rc,n;
 
-    strcpy(serialport, "/dev/ttyACM0");
+    strcpy(serialport, "/dev/ttyACM0"); // COM Port for the Arduino
 
     fd = serialport_init(serialport, baudrate);
 
-    initscr();
+    initscr(); // Screen manipulation start function
 
-    cbreak();
+    cbreak(); // Function to make possible cancelation
 
-    system("clear");
+    system("clear"); // Clean screen for fresh starter
 
-    gotoxy(x, y);
-    printf("%c", car);
+    // To print Starting message
+    // It gives time to the arduino to start listening
+    for(i = 10; i > 0; i--){
+      printf("Starting simulation in %i seconds. \n", i);
+      delay(1000);
+      system("clear");
+    }
+
+    gotoxy(x, y); // Start position for car
+    printf("%c", car); // First printage of the car
 
     do{
 
-      c = getcht();
-      // printf("\nYou typed: %c\n", c);
+      c = getcht(); // Calling function to get key pressed
 
-      switch (c){
-        case 'w':
-          serialport_writebyte(fd, 1);
+      switch (c){ // Options for pressed key
+        case 'w':  // For forward movement
+          serialport_writebyte(fd, 1); // Sending instruction to arduino to move forward
 
-          switch (car){
+          switch (car){ // To respond from previous position
             case '>':
               x = x + 1;
               break;
@@ -131,10 +145,10 @@ int main(){
               break;
           }
           break;
-        case 'a':
-          serialport_writebyte(fd, 2);
+        case 'a': // For left movement
+          serialport_writebyte(fd, 2); // Sending instruction to arduino to move left
 
-          switch (car){
+          switch (car){ // To respond from previous position
             case '>':
               car = '^';
               break;
@@ -151,10 +165,10 @@ int main(){
               break;
           }
           break;
-        case 's':
-          serialport_writebyte(fd, 3);
+        case 's':  // For backwards movement
+          serialport_writebyte(fd, 3); // Sending instruction to arduino to move backwards
 
-          switch (car){
+          switch (car){ // to respond from previous movement
             case '>':
               x = x - 1;
               break;
@@ -171,10 +185,10 @@ int main(){
               break;
           }
           break;
-        case 'd':
-          serialport_writebyte(fd, 4);
+        case 'd': // For right movement
+          serialport_writebyte(fd, 4); // Sending instruction to arduino to move right
 
-          switch (car){
+          switch (car){ // to respond from previous movement
               case '>':
                 car = 'v';
                 break;
@@ -191,25 +205,27 @@ int main(){
                 break;
             }
           break;
-        case 'p':
+        case 'p':  // For ending program
           serialport_writebyte(fd, 5);
           break;
         default:
           break;
       }
       
-      gotoxy(x, y);
+      gotoxy(x, y); // For each call it prints the new position of the car
       printf("%c", car);
 
-      delay(1000);
-    }while(c != 'p');
+      // delay(1000);
+    }while(c != 'p'); // It works while it isn't finished
 
-    clear();
-    endwin();
+    clear(); // Clears the window one last time
+    endwin(); // Ends screen manipulation
 
-    system("clear");
+    system("clear"); // Clears the terminal
+
+    // To print Ending message
     for(i = 10; i > 0; i--){
-      printf("Finalizando simulacion en %i segundos. \n", i);
+      printf("Ending simulation in %i seconds. \n", i);
       delay(1000);
       system("clear");
     }
