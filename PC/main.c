@@ -127,6 +127,7 @@ int main(){
       switch (c){ // Options for pressed key
         case 'w':  // For forward movement
           serialport_writebyte(fd, 1); // Sending instruction to arduino to move forward
+          delay(1000); // Time that takes to move forward
 
           switch (car){ // To respond from previous position
             case '>':
@@ -147,6 +148,7 @@ int main(){
           break;
         case 'a': // For left movement
           serialport_writebyte(fd, 2); // Sending instruction to arduino to move left
+          delay(1240); // Time that takes to move left
 
           switch (car){ // To respond from previous position
             case '>':
@@ -167,6 +169,7 @@ int main(){
           break;
         case 's':  // For backwards movement
           serialport_writebyte(fd, 3); // Sending instruction to arduino to move backwards
+          delay(1000); // Time that takes to move backwards
 
           switch (car){ // to respond from previous movement
             case '>':
@@ -187,6 +190,7 @@ int main(){
           break;
         case 'd': // For right movement
           serialport_writebyte(fd, 4); // Sending instruction to arduino to move right
+          delay(8220); // Time that takes to move right
 
           switch (car){ // to respond from previous movement
               case '>':
@@ -215,7 +219,6 @@ int main(){
       gotoxy(x, y); // For each call it prints the new position of the car
       printf("%c", car);
 
-      // delay(1000);
     }while(c != 'p'); // It works while it isn't finished
 
     clear(); // Clears the window one last time
